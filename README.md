@@ -1,10 +1,13 @@
 ocaml-socks
 ===========
 
-SOCKS4a library for ocaml clients and servers
+SOCKS4a/SOCKS5 library for OCaml clients and servers
 ---------------------------------------------
 
-This library implements functions for parsing and generating SOCKS4A `CONNECT` headers (the current version does not handle `BIND` since I haven't seen that in use anywhere).
+This library implements functions for parsing and generating SOCKS4A and SOCKS5 requests and responses.
+Tthe current version does not handle `BIND` since I haven't seen that in use anywhere.
+
+
 
 ### Resources
 

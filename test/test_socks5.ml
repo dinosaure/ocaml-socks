@@ -77,7 +77,7 @@ let test_making_a_request _ =
                           ^ hostname
                           ^ (bigendian_port_of_int port)
        | Error (Invalid_hostname : request_invalid_argument)
-           when 0 = String.length hostname  
+           when 0 = String.length hostname
            || 255 < String.length hostname -> true
        | _ -> false
       end
