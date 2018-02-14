@@ -11,7 +11,11 @@ Tthe current version does not handle `BIND` since I haven't seen that in use any
 
 ### Resources
 
-The protocol description is included in this repository in the files [SOCKS4.protocol.txt] and [SOCKS4A.protocol.txt] for SOCKS4 and the 4A extension, respectively.
+The protocol description is included in this repository in the files
+- [SOCKS4.protocol.txt] and [SOCKS4A.protocol.txt] for SOCKS4 and the 4A extension, respectively.
+- [SOCKS5_rfc1928.txt] and [SOCKS5_rfc1929.txt] for SOCKS5, and SOCKS5 Username/Password authentication.
 
 [SOCKS4.protocol.txt]: ./rfc/SOCKS4.protocol.txt
 [SOCKS4A.protocol.txt]: ./rfc/SOCKS4A.protocol.txt
+[SOCKS5_rfc1928.txt]: ./rfc/SOCKS5_rfc1928.txt
+[SOCKS5_rfc1929.txt]: ./rfc/SOCKS5_rfc1929.txt

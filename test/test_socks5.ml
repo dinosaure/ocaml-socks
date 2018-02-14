@@ -171,15 +171,16 @@ let test_make_socks5_response _ =
     | Error () when 255 < domain_len -> true
     | Ok serialized ->
       begin match parse_socks5_response (serialized ^ extraneous) with
+      | Error _ -> false
       | Ok (_, {address = Domain_address parsed_domain; _}, _)
         when parsed_domain <> domain -> false
       | Ok (_, {port = parsed_port; _}, _)
         when parsed_port <> bnd_port -> false
       | Ok (_, _, leftover_bytes)
         when leftover_bytes <> extraneous -> false
-      | Error _ -> false
       | Ok (parsed_reply, {address = Domain_address _; _}, _)
         when parsed_reply = reply -> true
+      | Ok _ -> false
       end
     | Error () -> false
     end

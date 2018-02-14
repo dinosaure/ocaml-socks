@@ -272,7 +272,7 @@ let parse_request buf : request_result =
             else acc
           in
           let auth_methods = f_auth_methods [] nmethods in
-          if List.length auth_methods <> 0
+          if auth_methods <> []
           && not @@ List.mem No_acceptable_methods auth_methods
           then
             Socks5_method_selection_request

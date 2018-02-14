@@ -1,6 +1,6 @@
 version = "0.1"
 description = "SOCKS 4A and SOCKS 5 (RFC 1928; RFC 1929) proxy library"
-requires = "rresult ipaddr qcheck oUnit"
+requires = "rresult ipaddr"
 archive(byte) = "socks.cma"
 plugin(byte) = "socks.cma"
 archive(native) = "socks.cmxa"
