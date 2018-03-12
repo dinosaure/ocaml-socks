@@ -1,6 +1,6 @@
 ocaml-socks
 ===========
-
+![Build status](https://travis-ci.org/cfcs/ocaml-socks.svg?branch=master)
 SOCKS4a/SOCKS5 library for OCaml clients and servers
 ---------------------------------------------
 
