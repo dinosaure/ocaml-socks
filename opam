@@ -1,7 +1,7 @@
 opam-version: "1.2"
 maintainer: "root@localhost"
-authors: [ "none" ]
-license: "gopher://license.to.kill"
+authors: [ "cfcs" ]
+license: "AGPL"
 homepage: "https://github.com/cfcs/ocaml-socks"
 dev-repo: "https://github.com/cfcs/ocaml-socks.git"
 bug-reports: "https://github.com/cfcs/ocaml-socks/issues"
@@ -22,17 +22,21 @@ depends: [
   "ocamlfind" {build}
   "ounit" {test}
   "qcheck" {test}
+  "logs"
   "rresult"
   "ipaddr"
+
+  #(* for the lwt wrapper*)
+  "lwt"
+  #(* for mirage at some point
+  #  "mirage-protocols"
+  #  "mirage-protocols-lwt"
+  #  "tcpip"
+  #*)
+
 ]
-depopts: [
-  (* for the lwt wrapper *)
-    "lwt"
-  (* mirage socks proxy *)
-    "mirage-protocols"
-    "mirage-protocols-lwt"
-    "tcpip"
-]
+
+
 conflicts: [
   "tcpip" {<"2.8.0"}
   "mirage-types-lwt" {<"3.0.0"}
