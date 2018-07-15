@@ -4,10 +4,10 @@ open Socks_types
 open Rresult
 
 let is_invalid (r : request_result) =
-  r = Invalid_request
+  r = Error `Invalid_request
 
 let is_incomplete (r : request_result) =
-  r = Incomplete_request
+  r = Error `Incomplete_request
 
 let is_request = function Ok _ -> true | _ -> false
 
@@ -46,17 +46,23 @@ let requests _ =
   begin match r with
   | Ok r ->
     begin match parse_request (r ^ "X") with
-    | Socks4_request (pr , "X") ->
+    | Ok Socks4_request (pr , "X") ->
       (   pr.port     = 515
        && pr.username = "user"
        && pr.address  = "host")
     | _ -> false
     end
-  | Error Invalid_hostname -> false
-  | Error Invalid_port -> false
+  | Error _ -> false
   end
   |> assert_bool
   "self-check request" ;;
+
+let regression_00 _ =
+  begin match Socks.parse_request "\004\001\000P\172\217\021\142yo\000" with
+  | Ok Socks4_request _ -> true
+  | _ -> false end
+  |> assert_bool "handling empty leftover in parse_request"
+;;
 
 (** TODO: OUnit2 should detect test cases automatically. *)
 let suite = [
@@ -65,4 +71,5 @@ let suite = [
     "parse_request: invalid_requests" >:: invalid_requests;
     "parse_request: incomplete_requests" >:: incomplete_requests;
     "is_request" >:: requests;
+    "regression 00: parse_request handling empty leftover" >:: regression_00;
   ]

@@ -19,7 +19,9 @@ type socks5_request =
 | Bind of socks5_struct
 | UDP_associate of socks5_struct
 
-type request_invalid_argument = Invalid_hostname | Invalid_port
+type request_invalid_argument = Rresult.R.msg
+
+type incomplete_response = [`Incomplete_reponse]
 
 type socks4_response_error =
   | Rejected
@@ -36,11 +38,14 @@ type socks5_authentication_method =
 
 type socks5_method_selection_request = socks5_authentication_method list
 
-type request_result =
-  | Invalid_request
-  | Incomplete_request (* The user should read more bytes and call again *)
+type request =
   | Socks5_method_selection_request of socks5_method_selection_request * leftover_bytes
   | Socks4_request of socks4_request * leftover_bytes
+
+type request_result =
+  (request,
+   [ `Incomplete_request (* The user should read more bytes and call again *)
+   | `Invalid_request]) result
 
 type socks5_reply_field =
   | (* 0 *) Succeeded
@@ -59,6 +64,6 @@ type socks5_response_error =
   | Invalid_response
 
 type socks5_username_password_request_parse_result =
-  | Incomplete_request
-  | Invalid_request
-  | Username_password of socks5_username * socks5_password * leftover_bytes
+  (
+    [ `Username_password of socks5_username * socks5_password * leftover_bytes],
+    [ `Invalid_request | `Incomplete_request ]) result

@@ -29,7 +29,7 @@ let test_making_a_request _ =
                 ^ "\x00\x00\x00\xff"
                 ^ username ^ "\x00"
                 ^ hostname ^ "\x00")
-      | Error Invalid_hostname when 0 = String.length hostname
+      | Error (`Msg "Invalid_hostname") when 0 = String.length hostname
                                  || 255 < String.length hostname -> true
       | _ -> false
       end
@@ -49,16 +49,16 @@ let test_parsing_a_request _ =
                 ^ extraneous)
       in
       begin match parse_request data with
-      | Socks4_request (out, x) when x = extraneous
+      | Ok Socks4_request (out, x) when x = extraneous
           && out = { port = q_port
                    ; address = q_hostname
                    ; username = q_username} -> true
-      | Socks4_request (_, _) -> false
-      | Invalid_request when 0 = String.length q_hostname
+      | Ok Socks4_request (_, _) -> false
+      | Error `Invalid_request when 0 = String.length q_hostname
                           || 255 < String.length q_hostname -> true
-      | Invalid_request
-      | Incomplete_request
-      | Socks5_method_selection_request (_, _) -> false
+      | Error `Invalid_request
+      | Error `Incomplete_request
+      | Ok Socks5_method_selection_request (_, _) -> false
       end
       );
 ;;

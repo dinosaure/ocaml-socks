@@ -1,9 +1,10 @@
 true: color(always), bin_annot, safe_string, principal
 true: warn(+A-4-18-41-42-44-48-58)
+true: package(logs), package(ipaddr)
 "src": include
 
-<*/*>: package(rresult), package(ipaddr)
-<*/*_lwt.*>: package(lwt), package(lwt.ppx)
+<*/*>: package(rresult)
+<*/*_lwt.*>: package(lwt)
 <mirage/*>: package(mirage-protocols), package(mirage-protocols-lwt), package(tcpip)
 <test/*>: package(oUnit), package(qcheck)
 
