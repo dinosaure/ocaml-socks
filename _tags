@@ -3,8 +3,9 @@ true: warn(+A-4-18-41-42-44-48-58)
 true: package(logs), package(ipaddr)
 "src": include
 
+<pkg/*.ml>: package(topkg)
+
 <*/*>: package(rresult)
 <*/*_lwt.*>: package(lwt)
 <mirage/*>: package(mirage-protocols), package(mirage-protocols-lwt), package(tcpip)
 <test/*>: package(oUnit), package(qcheck)
-

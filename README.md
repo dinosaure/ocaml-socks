@@ -20,13 +20,30 @@ Unfortunately this module does not work with MirageOS.
   Eckhart Köppen has [a fork](https://github.com/ekoeppen/ocaml-socks5-client)
   that seems to implement this. A pull request to integrate this would be nice.
 
+### Building
+
+To avoid always linking against `Lwt`/`Async`/`MirageOS` and introducing huge
+unneeded dependencies, this repository contains multiple OPAM packages:
+
+- `socks`
+- `socks-lwt`
+
+A `Makefile` is provided for your convenience:
+
+```shell
+ocaml-socks$ make lwt
+ocaml-socks$ make docs
+ocaml-socks$ make all
+ocaml-socks$ make clean
+```
+
 ### Generating the documentation
 
 This module is documented using `mli` docstrings.
 After installing the `topkg-care` OPAM package you can compile the documentation
 to HTML for viewing in your browser like this:
 ```shell
-ocaml-socks$ topkg doc
+ocaml-socks$ make docs
 # No parallelism done
 Generated API doc in /home/user/ocaml/socks/_build/doc/api.docdir/
 

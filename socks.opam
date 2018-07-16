@@ -18,26 +18,24 @@ build-test: [
 ]
 
 depends: [
-  "ocamlbuild" {build}
-  "ocamlfind" {build}
+  # {build}
+  "ocamlbuild"
+  "ocamlfind"
+  "topkg"
+
+  "topkg-care" {doc}
+
   "ounit" {test}
   "qcheck" {test}
+
   "logs"
   "rresult"
   "ipaddr"
 
-  #(* for the lwt wrapper*)
-  "lwt"
   #(* for mirage at some point
   #  "mirage-protocols"
   #  "mirage-protocols-lwt"
   #  "tcpip"
   #*)
 
-]
-
-
-conflicts: [
-  "tcpip" {<"2.8.0"}
-  "mirage-types-lwt" {<"3.0.0"}
 ]

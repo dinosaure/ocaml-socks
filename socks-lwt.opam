@@ -1,0 +1,36 @@
+opam-version: "1.2"
+maintainer: "root@localhost"
+authors: [ "cfcs" ]
+license: "AGPL"
+homepage: "https://github.com/cfcs/ocaml-socks"
+dev-repo: "https://github.com/cfcs/ocaml-socks.git"
+bug-reports: "https://github.com/cfcs/ocaml-socks/issues"
+
+available: [ ocaml-version >= "4.04.2" ]
+
+build: [
+  ["ocaml" "pkg/pkg-lwt.ml" "build" "--tests" "false" ]
+]
+build-test: [
+  ["ocaml" "pkg/pkg-lwt.ml" "build" "-n" "socks-lwt" "--tests" "true"  ]
+  ["ocaml" "pkg/pkg-lwt.ml" "test"  "-n" "socks-lwt"]
+]
+
+depends: [
+  # {build}
+  "ocamlbuild"
+  "ocamlfind"
+  "topkg"
+
+  "topkg-care" {doc}
+
+  "ounit" {test}
+  "qcheck" {test}
+
+  "ipaddr"
+  "logs"
+  "rresult"
+
+  "socks"
+  "lwt"
+]

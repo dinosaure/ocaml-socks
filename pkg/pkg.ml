@@ -4,13 +4,21 @@
 open Topkg
 
 let () =
-  (*let mirage = Conf.with_pkg ~default:false "mirage" in*)
-  let lwt = Conf.with_pkg ~default:true "lwt" in
-  Pkg.describe "socks" @@ fun c ->
-  (*let mirage = Conf.value c mirage in*)
-  let lwt = Conf.value c lwt in
-  Ok [ Pkg.mllib ~api:["Socks"] "src/socks.mllib"
-     (*; Pkg.mllib ~cond:mirage "mirage/socks.mllib"*)
-     ; Pkg.mllib ~cond:lwt "src/socks_lwt.mllib"
-     ; Pkg.test "test/test"
-     ]
+
+  let opams =
+    [ Pkg.opam_file "socks.opam"
+    ] in
+
+  Pkg.describe ~opams "socks" @@ fun c ->
+  begin match Conf.pkg_name c with
+    | "socks" ->
+      Ok
+        [ Pkg.mllib ~api:["Socks"] "src/socks.mllib"
+        ; Pkg.test "test/test"
+          ;
+        ]
+    | "socks-lwt" ->
+      Error (`Msg "You need to build socks-lwt with \
+                   topkg bu --pkg-file pkg/pkg-lwt.ml")
+    | _ -> Error (`Msg "pkg.ml called with invalid pkg name")
+  end
