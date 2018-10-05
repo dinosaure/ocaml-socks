@@ -41,9 +41,10 @@ val make_socks4_response : success:bool -> string
 
 val parse_socks4_response : string -> (leftover_bytes,
                                        socks4_response_error) Result.result
-(** [parse_response result] returns an OK [Result.result] with a unit value on
-    success, and a [Rejected] on failure. Bad values return an
-    [Incomplete_response]. *)
+(** [parse_response result] returns an OK [Result.result] with the extraneous
+    string (the first part of the destination's transmission leftover after
+    parsing the response) on success,
+    and a [Rejected] on failure. Bad values return an [Incomplete_response]. *)
 
 (** {2:socks5_specific Functions specific to SOCKS 5} *)
 

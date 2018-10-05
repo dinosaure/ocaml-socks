@@ -366,13 +366,10 @@ let parse_socks4_response result
   if 8 > buf_len then
     R.error (Incomplete_response : socks4_response_error)
   else
-  if result.[0] = '\x00'
-    && result.[1] = '\x5a'
-    (* TODO not checking port *)
-    && result.[4] = '\x00'
-    && result.[5] = '\x00'
-    && result.[6] = '\x00'
-    && result.[7] = '\xff'
+  if result.[0] = '\x00' (* VN, should be 0 *)
+  && result.[1] = '\090' (* Request granted *)
+     (* "The remaining fields are ignored" *)
+     (* TODO expose the resolved IP? *)
   then
     if buf_len <> 8 then
       R.ok @@ String.sub result 8 (buf_len - 8)

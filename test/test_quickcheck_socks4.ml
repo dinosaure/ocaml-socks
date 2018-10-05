@@ -63,8 +63,23 @@ let test_parsing_a_request _ =
       );
 ;;
 
+let test_integrity _ =
+  begin
+    match Socks.(parse_socks4_response (make_socks4_response ~success:true))
+    with
+    | Error _ -> failwith "integrity: couldn't make valid OK response"
+    | Ok "" -> ()
+    | Ok _ -> failwith "integrity: why do we think there is extraneous data?"
+  end ;
+    begin
+    match Socks.(parse_socks4_response (make_socks4_response ~success:false))
+    with
+    | Error Rejected -> ()
+    | _ -> failwith "integrity: couldn't make valid FAIL response"
+  end
 
 let suite = [
   "make_socks4_request" >:: test_making_a_request;
   "parse_socks4_request">:: test_parsing_a_request;
+  "socks4 self-integrity" >:: test_integrity;
   ]

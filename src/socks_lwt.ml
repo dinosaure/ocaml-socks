@@ -401,3 +401,34 @@ let easy_establish_pw_server ~username ~password =
     (client_allow_localhost
        (auth_username_password (fun (u,p) -> u = username && p = password)
           resolve_dns_and_forward_tcp))
+
+let easy_connect_socks4a_client ?(socks_port=1080) ?(username="")
+    ~server hostname port =
+  Lwt.wrap (fun () ->
+      Socks_log.debug (fun m -> m "resolving %s:%d" server socks_port) ;
+      Lwt_unix.ADDR_INET
+        (Unix.inet_addr_of_string server, socks_port)
+    ) >>= fun server_addr ->
+  R.(make_socks4_request ~username ~hostname port |> R.get_ok) |> fun request ->
+  Lwt_io.open_connection server_addr
+  >>= fun ((server_in, server_out) as socket) ->
+  Lwt_io.write_from_string_exactly server_out request 0 (String.length request)
+  >>= fun () ->
+  Lwt_io.flush server_out >>= fun () ->
+  let resp_buf = Bytes.make 1024 '\000' in
+  let rec loop offset =
+    if offset >= 1024 then
+      Lwt.return (Error (`Msg "Invalid response"))
+    else
+      Lwt_io.read_into server_in resp_buf offset
+        (Bytes.length resp_buf-offset) >>= function
+      | 0 -> Lwt.return (Error (`Msg "Connection died"))
+      | rcvd ->
+        let offset = offset + rcvd in
+        begin match
+            Socks.parse_socks4_response (Bytes.sub_string resp_buf 0 offset)
+          with
+          | Ok leftover -> Lwt.return (Ok (socket, leftover))
+          | Error Rejected -> Lwt.return (Error (`Msg "Rejected"))
+          | Error Incomplete_response -> loop offset end
+  in loop 0

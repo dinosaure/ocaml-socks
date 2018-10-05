@@ -61,6 +61,16 @@ type ('req_err, 'auth_error, 'addr_err) address_policy =
 
 (** {1:client Making a client connection} *)
 
+val easy_connect_socks4a_client :
+  ?socks_port:int -> ?username:string ->
+  server:string -> string -> int ->
+  ((channel * leftover_bytes), R.msg) Result.result Lwt.t
+(** [easy_connect_socks4a_client ?socks_port ?username server hostname port]
+    is a SOCKS4{_ A} connection to [hostname:port] through [server:socks_port],
+    or an error message.
+    If [?socks_port] is left out, the default is 1080;
+    and if [username] is left out, an empty string is sent.
+*)
 
 (** TODO write this section.
 
@@ -161,6 +171,40 @@ val client_allow_localhost :
 
 (** {1:examples Examples} *)
 
+(** {2:connecting_to_socks4a_server Connecting through a SOCKS4a server} *)
+
+(** To establish a connection to a SOCKS4{_ A} server,
+    {!easy_connect_socks4_client} is provided.
+
+    For instance, to establish a connection through your local Tor client you
+    can make use of its SOCKS4{_ A} interface listening on port 9050:
+
+    [Lwt_main.run
+     ( let open Lwt.Infix in
+       let server_hostname = "mirage.io" in
+       Socks_lwt.easy_connect_socks4a_client ~socks_port:9050
+           ~server:"127.0.0.1" server_hostname 80 >>= fun result ->
+       match result with
+       | Error (`Msg message) -> Lwt_io.printf "Failed: %s\n" message
+       | Ok ((input_fd, output_fd), first_received) ->
+           Lwt_io.printf "Received: %S\n" first_received ;
+           let request = "GET / HTTP/1.1\r\nHost: "
+                         ^ server_hostname ^ "\r\n\r\n" in
+           Lwt_io.write output_fd request >>= fun () ->
+           let rec read_lines = function
+               | 0 -> Lwt.return ()
+               | i ->
+                   Lwt_io.read_line input_fd >>= fun received ->
+                   Lwt_io.printf "Received: %S\n" received
+                   >>= fun () -> read_lines (i-1)
+           in read_lines 10 >>= fun () ->
+           Lwt_io.close input_fd
+     )]
+
+    If you need a local proxy to test with, see {!running_a_server}.
+    You can then proceed to connect to that server (on port 1080):
+    [Socks_lwt.easy_connect_socks4a_client ~server:"127.0.0.1" "example.com" "80"]
+*)
 
 (** {2:writing_an_address_policy Writing an address policy} *)
 (** This is the implementation for {!client_allow_localhost}:
@@ -204,6 +248,13 @@ val client_allow_localhost :
     end else
       Lwt_result.fail (`Msg "Client did not offer user/pw auth")
     ]
+*)
+
+(** {2:running_a_server} Running a server *)
+
+(** To run a basic unauthenticated proxy server on your local machine
+    you can run this in utop:
+    [Socks_lwt.easy_establish_server ();;]
 *)
 
 (** {2:testing_your_server Testing connections to your server} *)
