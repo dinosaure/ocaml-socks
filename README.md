@@ -31,7 +31,7 @@ unneeded dependencies, this repository contains multiple OPAM packages:
 A `Makefile` is provided for your convenience:
 
 ```shell
-ocaml-socks$ make lwt
+ocaml-socks$ make lib-lwt
 ocaml-socks$ make docs
 ocaml-socks$ make all
 ocaml-socks$ make clean

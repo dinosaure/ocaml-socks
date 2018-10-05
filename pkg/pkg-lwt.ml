@@ -16,5 +16,5 @@ let () =
       Ok [
         Pkg.mllib ~api:["Socks_lwt"] "src/socks_lwt.mllib"
       ]
-    | _ -> Error (`Msg "pkg.ml called with invalid pkg name")
+    | _ -> Error (`Msg "pkg-lwt.ml called with invalid pkg name")
   end

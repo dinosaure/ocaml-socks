@@ -32,10 +32,4 @@ depends: [
   "rresult"
   "ipaddr"
 
-  #(* for mirage at some point
-  #  "mirage-protocols"
-  #  "mirage-protocols-lwt"
-  #  "tcpip"
-  #*)
-
 ]

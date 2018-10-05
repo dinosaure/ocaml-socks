@@ -1,6 +1,6 @@
 version = "0.1"
 description = "SOCKS 4A and SOCKS 5 (RFC 1928; RFC 1929) - Lwt helpers"
-requires = "ipaddr logs lwt rresult socks"
+requires = "ipaddr logs lwt.unix rresult socks"
 archive(byte) = "socks_lwt.cma"
 plugin(byte) = "socks_lwt.cma"
 archive(native) = "socks_lwt.cmxa"
