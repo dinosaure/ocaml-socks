@@ -31,5 +31,5 @@ depends: [
   "logs"
   "rresult"
   "ipaddr"
-
+  "sexplib0" # why is this a dependency? :-(
 ]
