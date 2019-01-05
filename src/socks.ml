@@ -272,8 +272,8 @@ let parse_socks5_connect buf =
     if buf_len < record_len then R.error `Incomplete_request
     else
       let address = match atyp with
-        | `ipv4 -> IPv4_address (Ipaddr.V4.of_bytes_exn @@ String.sub buf 4 4)
-        | `ipv6 -> IPv6_address (Ipaddr.V6.of_bytes_exn @@ String.sub buf 4 16)
+        | `ipv4 -> IPv4_address (Ipaddr.V4.of_bytes_raw buf 4)
+        | `ipv6 -> IPv6_address (Ipaddr.V6.of_bytes_raw buf 4)
       in
       let port =
         int_of_bigendian_port_tuple
@@ -390,10 +390,8 @@ let parse_socks5_response buf
         ('\x01'|'\x03'|'\x04' as atyp) ->
         begin match atyp with
           | '\x01' when 4+4+2 <= buf_len -> (* IPv4 *)
-            begin match Ipaddr.V4.of_bytes @@ String.sub buf 4 4 with
-              | Some ip -> Ok (IPv4_address ip)
-              | None -> Error Invalid_response
-            end >>| fun address -> (address, (*port offset:*) 4+4)
+            Ok (IPv4_address (Ipaddr.V4.of_bytes_raw buf 4),
+                (*port offset:*) 4+4)
           | '\x03' when 4+1+2 <= buf_len -> (* DOMAINNAME *)
             let domain_len = int_of_char buf.[4] in
             if 0 = domain_len
@@ -406,10 +404,8 @@ let parse_socks5_response buf
               R.ok (domain , 4+1+domain_len)
           | '\x04' when 4+16+2 <= buf_len -> (* IPv6 *)
             let sizeof_ipv6 = 16 (*128/8*) in
-            begin match Ipaddr.V6.of_bytes @@ String.sub buf 4 sizeof_ipv6 with
-              | Some ip -> Ok (IPv6_address ip)
-              | None -> Error Invalid_response
-            end >>| fun address -> (address, 4+sizeof_ipv6)
+            Ok (IPv6_address (Ipaddr.V6.of_bytes_raw buf 4),
+                (*port offset*) 4+sizeof_ipv6)
           | ('\x01'|'\x03'|'\x04') ->
             (* ^-- when-guards are used for size constraints above *)
             R.error Incomplete_response
