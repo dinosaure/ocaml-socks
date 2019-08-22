@@ -164,13 +164,13 @@ let parse_socks5_username_password_response buf =
   | exception Invalid_argument _ -> Error `Incomplete_request
 
 let serialize_address = function
-  | IPv4_address ipv4 -> R.ok ["\x01"; Ipaddr.V4.to_bytes ipv4 ]
+  | IPv4_address ipv4 -> R.ok ["\x01"; Ipaddr.V4.to_octets ipv4 ]
   | Domain_address hostname ->
     encode_str hostname
     |> R.reword_error (fun () ->
         R.msgf "serialize_address: Unable to encode domain address %S" hostname)
     >>| fun encoded -> ["\x03"; encoded]
-  | IPv6_address ipv6 -> R.ok ["\x04"; Ipaddr.V6.to_bytes ipv6 ]
+  | IPv6_address ipv6 -> R.ok ["\x04"; Ipaddr.V6.to_octets ipv6 ]
 
 let make_socks5_request request =
   (* Serialize the address to bytes: *)
@@ -272,8 +272,8 @@ let parse_socks5_connect buf =
     if buf_len < record_len then R.error `Incomplete_request
     else
       let address = match atyp with
-        | `ipv4 -> IPv4_address (Ipaddr.V4.of_bytes_raw buf 4)
-        | `ipv6 -> IPv6_address (Ipaddr.V6.of_bytes_raw buf 4)
+        | `ipv4 -> IPv4_address (Ipaddr.V4.of_octets_exn ~off:4 buf)
+        | `ipv6 -> IPv6_address (Ipaddr.V6.of_octets_exn ~off:4 buf)
       in
       let port =
         int_of_bigendian_port_tuple
@@ -390,7 +390,7 @@ let parse_socks5_response buf
         ('\x01'|'\x03'|'\x04' as atyp) ->
         begin match atyp with
           | '\x01' when 4+4+2 <= buf_len -> (* IPv4 *)
-            Ok (IPv4_address (Ipaddr.V4.of_bytes_raw buf 4),
+            Ok (IPv4_address (Ipaddr.V4.of_octets_exn ~off:4 buf),
                 (*port offset:*) 4+4)
           | '\x03' when 4+1+2 <= buf_len -> (* DOMAINNAME *)
             let domain_len = int_of_char buf.[4] in
@@ -404,7 +404,7 @@ let parse_socks5_response buf
               R.ok (domain , 4+1+domain_len)
           | '\x04' when 4+16+2 <= buf_len -> (* IPv6 *)
             let sizeof_ipv6 = 16 (*128/8*) in
-            Ok (IPv6_address (Ipaddr.V6.of_bytes_raw buf 4),
+            Ok (IPv6_address (Ipaddr.V6.of_octets_exn ~off:4 buf),
                 (*port offset*) 4+sizeof_ipv6)
           | ('\x01'|'\x03'|'\x04') ->
             (* ^-- when-guards are used for size constraints above *)
