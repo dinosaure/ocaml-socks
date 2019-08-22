@@ -2,7 +2,6 @@ open QCheck
 open QCheck.Test
 open OUnit2
 open Socks
-open Socks_types
 
 let bigendian_port_of_int port =
   String.concat ""

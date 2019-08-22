@@ -1,6 +1,5 @@
 open OUnit2
 open Socks
-open Socks_types
 open Rresult
 
 let is_invalid (r : request_result) =

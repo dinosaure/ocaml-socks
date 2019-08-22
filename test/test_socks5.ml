@@ -2,7 +2,6 @@ open QCheck
 open QCheck.Test
 open OUnit2
 open Socks
-open Socks_types
 
 let bigendian_port_of_int port =
   String.concat ""
@@ -174,7 +173,7 @@ let test_make_socks5_response _ =
   @@ (fun (bnd_port, reply, domain, extraneous) ->
       let reply = begin match reply with
           true -> Succeeded
-        | false -> Socks_types.General_socks_server_failure end in
+        | false -> Socks.General_socks_server_failure end in
     let domain_len = String.length domain in
     begin match make_socks5_response ~bnd_port reply (Domain_address domain) with
     | Error _ when 0 = domain_len -> true

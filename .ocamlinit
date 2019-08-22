@@ -1,11 +1,14 @@
-#require "logs.top"
+#use "omod.top";;
+#use "down.top";;
 
-#require "rresult.top"
-#require "ipaddr.top"
-#mod_use "src/socks_types.ml"
-#mod_use "src/socks.ml"
+Omod.load "logs";;
+Omod.load "rresult";;
+Omod.load "ipaddr";;
+#mod_use "src/socks_types.ml";;
+#mod_use "src/socks.ml";;
 
-#require "lwt.unix"
+Omod.load "lwt";;
+Omod.load "lwt.unix";;
 #mod_use "src/socks_lwt.ml";;
 
 (*

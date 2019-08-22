@@ -4,7 +4,7 @@
 (** {1 Types}*)
 
 open Rresult
-open Socks_types
+open Socks
 
 type channel =
   Lwt_io.input_channel * Lwt_io.output_channel

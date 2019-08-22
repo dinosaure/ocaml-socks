@@ -3,7 +3,6 @@
 open Rresult
 open Lwt
 open Socks
-open Socks_types
 
 type channel = Lwt_io.input_channel * Lwt_io.output_channel
 
@@ -11,18 +10,18 @@ type client_data_cb = string -> channel -> unit Lwt.t
 (* leftover_bytes from client -> client channel -> Lwt.t *)
 
 type 'error request_policy =
-  [ `Socks4 of Socks_types.socks4_request
-  | `Socks5 of Socks_types.socks5_request ] ->
+  [ `Socks4 of Socks.socks4_request
+  | `Socks5 of Socks.socks5_request ] ->
   (client_data_cb, 'error) Lwt_result.t
   constraint 'error = [> Rresult.R.msg ]
 
 type ('req_err, 'auth_err) auth_callback =
-  Socks_types.socks5_authentication_method ->
+  Socks.socks5_authentication_method ->
   (([> R.msg] as 'req_err) request_policy, 'auth_err) Lwt_result.t
 
 type ('req_err, 'auth_err) auth_policy =
-  Socks_types.socks5_method_selection_request ->
-  ( Socks_types.socks5_authentication_method
+  Socks.socks5_method_selection_request ->
+  ( Socks.socks5_authentication_method
     * ('req_err, R.msg as 'auth_err) auth_callback,
     'auth_err) Lwt_result.t
 
@@ -409,7 +408,7 @@ let easy_connect_socks4a_client ?(socks_port=1080) ?(username="")
       Lwt_unix.ADDR_INET
         (Unix.inet_addr_of_string server, socks_port)
     ) >>= fun server_addr ->
-  R.(make_socks4_request ~username ~hostname port |> R.get_ok) |> fun request ->
+  make_socks4_request ~username ~hostname port |> R.get_ok |> fun request ->
   Lwt_io.open_connection server_addr
   >>= fun ((server_in, server_out) as socket) ->
   Lwt_io.write_from_string_exactly server_out request 0 (String.length request)
