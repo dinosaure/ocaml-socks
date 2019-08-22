@@ -187,7 +187,7 @@ let reply_to_socks5_connect ((_,client_out):channel)
       (fun fmt _ -> Format.pp_print_string fmt ("Error: " ^error)),
       make_socks5_response General_socks_server_failure
         ~bnd_port:0 (IPv4_address
-                       (Ipaddr.V4.of_bytes_exn "\x00\x00\x00\x00"))
+                       (Ipaddr.V4.of_octets_exn "\x00\x00\x00\x00"))
   end |> function
   | (status,Ok response_str) ->
     Socks_log.debug (fun m ->

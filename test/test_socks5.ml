@@ -209,10 +209,10 @@ let test_parse_socks5_response_ipv4_ipv6 _ =
       | true ->
         let ip32 = Int32.of_int ip_int in
         let ip = Ipaddr.V6.of_int32 (ip32, ip32, ip32, ip32) in
-        "\x04", Ipaddr.V6 ip, Ipaddr.V6.to_bytes ip
+        "\x04", Ipaddr.V6 ip, Ipaddr.V6.to_octets ip
       | false ->
         let ip = Ipaddr.V4.of_int32 (Int32.of_int ip_int) in
-        "\x01", Ipaddr.V4 ip , Ipaddr.V4.to_bytes ip
+        "\x01", Ipaddr.V4 ip , Ipaddr.V4.to_octets ip
       end
     in
     let response = header ^ atyp ^ ip_bytes ^ (bigendian_port_of_int port) ^ extraneous in
