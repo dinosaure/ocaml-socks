@@ -16,7 +16,7 @@ open Socks_types
     see the {{:#examples} examples section}.
 
     If you're writing a client or server with [Lwt], consider looking at the
-    [Socks_lwt] documentation.
+    {!Socks_lwt} documentation.
 *)
 
 (** {2:general General functions} *)

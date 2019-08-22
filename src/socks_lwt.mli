@@ -253,7 +253,7 @@ val client_allow_localhost :
     ]
 *)
 
-(** {2:running_a_server} Running a server *)
+(** {2:running_a_server Running a server} *)
 
 (** To run a basic unauthenticated proxy server on your local machine
     you can run this in utop:
