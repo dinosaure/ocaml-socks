@@ -1,6 +1,6 @@
 (** Parsing and generation of SOCKS client/server messages *)
 
-open Socks_types
+include Socks_types
 
 (** This library implements functions for parsing and generating
     the packets required to establish connections using
