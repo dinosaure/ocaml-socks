@@ -9,6 +9,6 @@ true: package(logs), package(ipaddr sexplib0)
 
 <*/*_lwt.*>: package(lwt.unix)
 
-<mirage/*>: package(mirage-protocols), package(mirage-protocols-lwt), package(tcpip), package(mirage-flow), package(mirage-flow-lwt)
+<mirage/*>: package(mirage-protocols), package(tcpip), package(mirage-flow)
 
 <test/*>: package(oUnit), package(qcheck)
