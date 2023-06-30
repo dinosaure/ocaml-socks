@@ -6,8 +6,7 @@
 open Rresult
 open Socks
 
-type channel =
-  Lwt_io.input_channel * Lwt_io.output_channel
+type channel = Lwt_io.input_channel * Lwt_io.output_channel
 (** A bi-directional communication channel *)
 
 type client_data_cb = string -> channel -> unit Lwt.t
@@ -17,9 +16,8 @@ type client_data_cb = string -> channel -> unit Lwt.t
 *)
 
 type 'error request_policy =
-  [ `Socks4 of socks4_request
-  | `Socks5 of socks5_request ] ->
-  (client_data_cb, 'error) Lwt_result.t
+     [ `Socks4 of socks4_request | `Socks5 of socks5_request ]
+  -> (client_data_cb, 'error) Lwt_result.t
   constraint 'error = [> Rresult.R.msg ]
 (** A request policy is a function that takes a [request] and returns
     a callback for performing the I/O of the allowed connection, or
@@ -31,8 +29,8 @@ type 'error request_policy =
 *)
 
 type ('req_err, 'auth_err) auth_callback =
-  socks5_authentication_method ->
-  (([> R.msg] as 'req_err) request_policy, 'auth_err) Lwt_result.t
+     socks5_authentication_method
+  -> (([> R.msg ] as 'req_err) request_policy, 'auth_err) Lwt_result.t
 (** An [auth_callback auth_method] is the {!request_policy}
     for the server to use for validating requests if the authentication
     succeeded, and an error if the authentication is rejected.
@@ -41,9 +39,11 @@ type ('req_err, 'auth_err) auth_callback =
 *)
 
 type ('req_err, 'auth_err) auth_policy =
-  socks5_method_selection_request ->
-  ( socks5_authentication_method * ('req_err, R.msg as 'auth_err) auth_callback,
-    'auth_err) Lwt_result.t
+     socks5_method_selection_request
+  -> ( socks5_authentication_method
+       * ('req_err, (R.msg as 'auth_err)) auth_callback
+     , 'auth_err )
+     Lwt_result.t
 (** Authentication policies are Lwt threads that select a desired authentication
     method for use by the client, and return a {!auth_callback} used to validate
     the client's credentials once they have been received by the server.
@@ -53,23 +53,27 @@ type ('req_err, 'auth_err) auth_policy =
 *)
 
 type ('req_err, 'auth_error, 'addr_err) address_policy =
-  Lwt_unix.sockaddr -> (([> R.msg] as 'req_err, 'auth_error) auth_policy,
-                        ([> R.msg] as 'addr_err)) Lwt_result.t
+     Lwt_unix.sockaddr
+  -> ( (([> R.msg ] as 'req_err), 'auth_error) auth_policy
+     , ([> R.msg ] as 'addr_err) )
+     Lwt_result.t
 (** Address policies filter connecting clients based on their IP and
     source port number.*)
-
 
 (** {1:client Making a client connection} *)
 
 val easy_connect_socks4a_client :
-  ?socks_port:int -> ?username:string ->
-  server:string -> string -> int ->
-  ((channel * leftover_bytes), R.msg) Result.result Lwt.t
+     ?socks_port:int
+  -> ?username:string
+  -> server:string
+  -> string
+  -> int
+  -> (channel * leftover_bytes, R.msg) result Lwt.t
 (** [easy_connect_socks4a_client ?socks_port ?username server hostname port]
     is a SOCKS4{_ A} connection to [hostname:port] through [server:socks_port],
-    or an error message.[
+    or an error message.
 
-]   If [?socks_port] is left out, the default is 1080;
+    If [?socks_port] is left out, the default is 1080;
     and if [username] is left out, an empty string is sent.
 *)
 
@@ -80,9 +84,7 @@ val easy_connect_socks4a_client :
     {{:https://github.com/ekoeppen/ocaml-socks5-client} Eckhart Köppen's fork}
 *)
 
-
 (** {1:server Running a SOCKS server} *)
-
 
 val easy_establish_server : unit -> Lwt_io.server Lwt.t
 (** [easy_establish_server ()] is a local proxy server that listens on
@@ -94,8 +96,8 @@ val easy_establish_server : unit -> Lwt_io.server Lwt.t
         ]{!resolve_dns_and_forward_tcp}[)]
 *)
 
-val easy_establish_pw_server : username:string -> password:string ->
-  Lwt_io.server Lwt.t
+val easy_establish_pw_server :
+  username:string -> password:string -> Lwt_io.server Lwt.t
 (** [easy_establish_pw_server username password] is {!easy_establish_server}
     with {!auth_username_password}[ (fun (u,p) -> u = username && p = password)]
     instead of {!auth_allow_all}.
@@ -105,8 +107,9 @@ val easy_establish_pw_server : username:string -> password:string ->
 *)
 
 val establish_server :
-  Lwt_unix.sockaddr -> (R.msg,R.msg,R.msg) address_policy ->
-  Lwt_io.server Lwt.t
+     Lwt_unix.sockaddr
+  -> (R.msg, R.msg, R.msg) address_policy
+  -> Lwt_io.server Lwt.t
 (** [establish_server listen_addr client_policy request_policy] is a server
     that listens on [listen_addr], using [client_policy] to perform access
     control based on the addresses of connecting clients, and
@@ -123,13 +126,11 @@ val forward_data : channel -> string -> channel -> unit Lwt.t
     received via the [client] channel.
 *)
 
-
 (** {1:policies Helper functions for constructing policies} *)
-
 
 (** {2:policies_requests Request policies} *)
 
-val resolve_dns_and_forward_tcp : [> R.msg] request_policy
+val resolve_dns_and_forward_tcp : [> R.msg ] request_policy
 (** [resolve_dns_and_forward_tcp client_channel] is a {!request_policy}
     that permits any address and tries to establishes a TCP connection
     (over either IPv4 or IPv6) to the target,
@@ -139,12 +140,12 @@ val resolve_dns_and_forward_tcp : [> R.msg] request_policy
 (** {2:policies_auth Authentication policies} *)
 
 val auth_allow_all :
-  ([> R.msg] as 'req_err) request_policy ->
-  ('req_err, 'auth_err) auth_policy
+  ([> R.msg ] as 'req_err) request_policy -> ('req_err, 'auth_err) auth_policy
 
-val auth_username_password : (socks5_username * socks5_password -> bool) ->
-  ('req_err) request_policy ->
-  ('req_err, [> R.msg]) auth_policy
+val auth_username_password :
+     (socks5_username * socks5_password -> bool)
+  -> 'req_err request_policy
+  -> ('req_err, [> R.msg ]) auth_policy
 (** [auth_username_password auth_cb] is an authentication policy that mandates
     RFC 1929 Username/Password authentication and uses [auth_cb] to validate the
     username/password combination received from the client.
@@ -157,30 +158,30 @@ val auth_username_password : (socks5_username * socks5_password -> bool) ->
 (** {2:policies_client Client policies} *)
 
 val client_allow_all :
-  (('req_err,'auth_err) auth_policy) ->
-  ('req_err, 'auth_err, 'client_err) address_policy
+     ('req_err, 'auth_err) auth_policy
+  -> ('req_err, 'auth_err, 'client_err) address_policy
 (** [client_allow_all request_policy] is an address policy that permits
     any client address to connect, and returns [request_policy] for validating
     their SOCKS request.*)
 
 val client_allow_localhost :
-    (('req_err,'auth_err) auth_policy) ->
-  ('req_err, 'auth_err, 'client_err) address_policy
+     ('req_err, 'auth_err) auth_policy
+  -> ('req_err, 'auth_err, 'client_err) address_policy
 (** [client_allow_localhost] is an address policy that permits
     clients connecting from [localhost], and returns [request_policy]
     for validating their SOCKS request.*)
-
 
 (** {1:examples Examples} *)
 
 (** {2:connecting_to_socks4a_server Connecting through a SOCKS4a server} *)
 
 (** To establish a connection to a SOCKS4{_ A} server,
-    {!easy_connect_socks4a_client} is provided.[
+    {!easy_connect_socks4a_client} is provided.
 
-    ]For instance, to establish a connection through your local Tor client you
-    can make use of its SOCKS4{_ A} interface listening on port 9050:[
+    For instance, to establish a connection through your local Tor client you
+    can make use of its SOCKS4{_ A} interface listening on port 9050:
 
+    {[
     Lwt_main.run
      ( let open Lwt.Infix in
        let server_hostname = "mirage.io" in
@@ -202,14 +203,16 @@ val client_allow_localhost :
           in read_lines 10 >>= fun () ->
           Lwt_io.close input_fd
     )
+    ]}
 
-    ]If you need a local proxy to test with, see {!running_a_server}.
+    If you need a local proxy to test with, see {!running_a_server}.
     You can then proceed to connect to that server (on port 1080):
     [Socks_lwt.easy_connect_socks4a_client
         ~server:"127.0.0.1" "example.com" "80"]
 *)
 
 (** {2:writing_an_address_policy Writing an address policy} *)
+
 (** This is the implementation for {!client_allow_localhost}:
     [let client_allow_localhost auth_policy : ('a,'b, R.msg) address_policy =
     function
@@ -222,6 +225,7 @@ val client_allow_localhost :
 *)
 
 (** {2:writing_an_auth_policy Writing an authentication policy} *)
+
 (** See {!auth_policy} for a brief explanation of authentication policies.
 
     The implementation for {!auth_username_password} looks roughly like this:
@@ -261,6 +265,7 @@ val client_allow_localhost :
 *)
 
 (** {2:testing_your_server Testing connections to your server} *)
+
 (** I found it useful to test making various connections to the server,
     here are some command examples:
 

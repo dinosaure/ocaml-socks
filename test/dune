@@ -1,0 +1,7 @@
+(executable
+ (name test)
+ (libraries socks qcheck-ounit ounit2))
+
+(rule
+ (alias runtest)
+ (action (run ./test.exe)))

@@ -1,0 +1,11 @@
+(library
+ (name socks)
+ (public_name socks)
+ (modules socks socks_types)
+ (libraries logs rresult ipaddr))
+
+(library
+ (name socks_lwt)
+ (public_name socks-lwt)
+ (modules socks_lwt)
+ (libraries socks lwt lwt.unix))

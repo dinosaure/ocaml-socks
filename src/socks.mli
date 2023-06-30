@@ -16,7 +16,7 @@ include module type of Socks_types
     see the {{:#examples} examples section}.
 
     If you're writing a client or server with [Lwt], consider looking at the
-    {!Socks_lwt} documentation.
+    [Socks_lwt] documentation.
 *)
 
 (** {2:general General functions} *)
@@ -28,8 +28,11 @@ val parse_request : string -> request_result
 
 (** {2:socks4a_specific Functions specific to SOCKS 4{_ A}} *)
 
-val make_socks4_request : username:string -> hostname:string -> int ->
-  (string, request_invalid_argument) result
+val make_socks4_request :
+     username:string
+  -> hostname:string
+  -> int
+  -> (string, request_invalid_argument) result
 (** [make_socks4_request ~username ~hostname port] returns a binary string
     which represents a SOCKS 4{_ A} request.
     The SOCKS 4{_ A} protocol does not support password authentication.
@@ -39,9 +42,9 @@ val make_socks4_response : success:bool -> string
 (** [make_response success] returns a binary string which represents a granted
     or rejected response. *)
 
-val parse_socks4_response : string -> (leftover_bytes,
-                                       socks4_response_error) Result.result
-(** [parse_response result] returns an OK [Result.result] with the extraneous
+val parse_socks4_response :
+  string -> (leftover_bytes, socks4_response_error) result
+(** [parse_response result] returns an OK [result] with the extraneous
     string (the first part of the destination's transmission leftover after
     parsing the response) on success,
     and a [Rejected] on failure. Bad values return an [Incomplete_response]. *)
@@ -62,7 +65,7 @@ val make_socks5_auth_request : username_password:bool -> string
 *)
 
 val make_socks5_username_password_request :
-  username:string -> password:string -> (string,unit) Result.result
+  username:string -> password:string -> (string, unit) result
 (** [make_socks5_username_password_request ~username ~password] returns a
     binary string which represents a SOCKS 5 password request from [RFC1929].
     The function fails if either of the strings are longer than 255 bytes,
@@ -79,8 +82,9 @@ val make_socks5_username_password_response : accepted:bool -> string
 (** Sent by the server in response to receiving a message from the client
     parsed with {!parse_socks5_username_password_request}.*)
 
-val parse_socks5_username_password_response : string ->
-  (bool * leftover_bytes, [`Incomplete_request | `Invalid_request]) result
+val parse_socks5_username_password_response :
+     string
+  -> (bool * leftover_bytes, [ `Incomplete_request | `Invalid_request ]) result
 (** Used by the client to parse a {!make_socks5_username_password_response}
     received from the server.
     [true] if the user/pw combination was accepted by the server and the
@@ -98,8 +102,8 @@ val make_socks5_auth_response : socks5_authentication_method -> string
     method the server wants the client to use.
 *)
 
-val make_socks5_request : socks5_request ->
-  (string, request_invalid_argument) Result.result
+val make_socks5_request :
+  socks5_request -> (string, request_invalid_argument) result
 (** [make_socks5_request (Connect|Bind {address; port}) ]
     returns a binary string which represents a SOCKS 5 request as described in
     RFC 1928 section "4. Requests" (on page 3).
@@ -107,17 +111,20 @@ val make_socks5_request : socks5_request ->
 *)
 
 val parse_socks5_connect :
-  string ->
-  (socks5_struct * leftover_bytes,
-   [> `Invalid_request | `Incomplete_request ])
-  Result.result
+     string
+  -> ( socks5_struct * leftover_bytes
+     , [> `Invalid_request | `Incomplete_request ] )
+     result
 (** [parse_socks5_connect buf] returns an OK result with port and hostname
     if [buf] represents a SOCKS 5 CONNECT command with the DOMAINNAME form.
     If anything is amiss, it will return [R.error] values, wrapping
     [Invalid_argument], [Invalid_request] and [Incomplete_request]. *)
 
-val make_socks5_response : socks5_reply_field -> bnd_port:int ->
-  socks5_address -> (string, Rresult.R.msg) result
+val make_socks5_response :
+     socks5_reply_field
+  -> bnd_port:int
+  -> socks5_address
+  -> (string, Rresult.R.msg) result
 (** [make_socks5_response reply_field ~bnd_port address] returns a binary string
     which represents the response to a
     SOCKS 5 action (CONNECT|BIND|UDP_ASSOCIATE).
@@ -125,14 +132,15 @@ val make_socks5_response : socks5_reply_field -> bnd_port:int ->
     TODO reference RFC section.
 *)
 
-val parse_socks5_response : string ->
-  (socks5_reply_field * socks5_struct * leftover_bytes,
-   socks5_response_error) result
+val parse_socks5_response :
+     string
+  -> ( socks5_reply_field * socks5_struct * leftover_bytes
+     , socks5_response_error )
+     result
 (** [parse_response response_string]
   TODO document. But basically it returns the error code (if any),
     and the remote bound address/port info from the server.
 *)
-
 
 (** {1:examples Examples} *)
 
