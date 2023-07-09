@@ -2,7 +2,7 @@ opam-version: "2.0"
 synopsis: "SOCKS4a and SOCKS5 library"
 maintainer: "root@localhost"
 authors: [ "cfcs" ]
-license: "AGPL"
+license: "AGPL-3.0"
 homepage: "https://github.com/cfcs/ocaml-socks"
 dev-repo: "git+https://github.com/cfcs/ocaml-socks.git"
 bug-reports: "https://github.com/cfcs/ocaml-socks/issues"
