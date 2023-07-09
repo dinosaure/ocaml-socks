@@ -1,0 +1,35 @@
+name: ocaml-socks
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: Tests
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ocaml-version: ["4.14.1", "4.13.1", "4.12.1", "4.11.2", "4.10.2", "4.09.1", "4.08.1"]
+        operating-system: [macos-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.operating-system }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-version }}
+          opam-local-packages: socks.opam socks-lwt.opam
+
+      - run: opam pin add . -n
+      - name: Install dependencies
+        run: opam install --deps-only -t socks socks-lwt
+
+      - name: Build
+        run: opam exec -- dune build -p socks,socks-lwt
+
+      - name: Test
+        run: opam exec -- dune runtest -p socks,socks-lwt
