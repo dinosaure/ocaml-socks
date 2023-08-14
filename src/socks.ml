@@ -143,12 +143,16 @@ let parse_socks5_username_password_request buf :
     | _ -> Error `Invalid_request
 
 let make_socks5_username_password_response ~accepted =
-  if accepted then "\x01\x00" else "\x01\xFF"
+  if accepted then "\x05\x00" else "\x05\xFF"
 
 let parse_socks5_username_password_response buf =
   match (buf.[0], buf.[1]) with
-  | '\x01', '\x00' -> Ok (true, String.(sub buf 2 (length buf - 2)))
-  | '\x01', _ -> Ok (true, String.(sub buf 2 (length buf - 2)))
+  | '\x05', '\x00' ->
+      Ok (No_authentication_required, String.(sub buf 2 (length buf - 2)))
+  | '\x05', '\x02' ->
+      Ok (Username_password ("", ""), String.(sub buf 2 (length buf - 2)))
+  | '\x05', '\xFF' ->
+      Ok (No_acceptable_methods, String.(sub buf 2 (length buf - 2)))
   | _ -> Error `Invalid_request
   | exception Invalid_argument _ -> Error `Incomplete_request
 

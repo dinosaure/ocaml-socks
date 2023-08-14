@@ -84,7 +84,9 @@ val make_socks5_username_password_response : accepted:bool -> string
 
 val parse_socks5_username_password_response :
      string
-  -> (bool * leftover_bytes, [ `Incomplete_request | `Invalid_request ]) result
+  -> ( socks5_authentication_method * leftover_bytes
+     , [ `Incomplete_request | `Invalid_request ] )
+     result
 (** Used by the client to parse a {!make_socks5_username_password_response}
     received from the server.
     [true] if the user/pw combination was accepted by the server and the
